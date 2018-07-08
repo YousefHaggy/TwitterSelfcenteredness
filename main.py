@@ -16,24 +16,21 @@ def _scrape():
     tree = html.fromstring(page.text.encode("ascii","ignore"))
 
     tweets = tree.xpath("//li//p")
-    tweetCount=1
+    tweetCount=0
     selfCenteredCount=0;
-    for tweet in tweets:
+    for tweet in tweets[:len(tweets)-1]:
         tweetCount+=1
         sentences=tweet.text_content().split(".")
         find=False;
         for sentence in sentences:
-	        if sentence.find("You always have the option to delete your Tweet location history")!=-1 or sentence.find("You can add location information to your Tweets, such as your city or precise location")!=-1:
-	            break;
 	        words=sentence.split()
 	        for word in words:
-	            if word.lower()=="I" or word.lower()=="my" or word.lower()=="me":
+	            if word.lower()=="i" or word.lower()=="my" or word.lower()=="me":
 	                selfCenteredCount+=1
 	                find=True
 	                break;
 	        if find:
 	            break;
-    return(jsonify({"Self-Centeredness":str(selfCenteredCount/tweetCount*100)+"%"}))
-
-
-
+    if tweetCount==0:
+        return(jsonify({"result": "no tweets on this acc!"}))
+    return(jsonify({"Self-Centeredness":str(selfCenteredCount/tweetCount*100)+"%", "Github":"https://github.com/YousefHaggy/TwitterSelfcenteredness"}))
